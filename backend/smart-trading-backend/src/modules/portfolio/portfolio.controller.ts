@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import * as portfolioService from './portfolio.service';
-import type { PricesQuery } from './portfolio.schemas';
 import { sendSuccess } from '../../utils/response';
 
 export async function getPortfolio(
