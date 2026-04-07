@@ -14,12 +14,12 @@ interface RawPosition {
   updated_at: Date;
 }
 
-interface PositionWithPrice extends RawPosition {
-  current_price?: number;
-}
+// ❌ REMOVE THIS (unused)
+// interface PositionWithPrice extends RawPosition {
+//   current_price?: number;
+// }
 
 // In production this calls your Market Data service or a price cache (Redis).
-// Here we accept an optional price map from the request for simulation purposes.
 function injectMarketPrices(
   positions: RawPosition[],
   prices: Record<string, number> = {}
@@ -124,14 +124,7 @@ export async function getPortfolioSummary(userId: string): Promise<{
   worst_trade: { symbol: string; pnl: number } | null;
   total_realised_pnl: number;
 }> {
-  const result = await pool.query<{
-    symbol: string;
-    side: string;
-    quantity: string;
-    fill_price: string;
-    // We calculate P&L per SELL trade by joining with the position snapshot
-    // For simplicity, compute on the raw trades table using a self-join window
-  }>(
+  const result = await pool.query<any>( // 🔥 TYPE FIX
     `WITH sell_trades AS (
        SELECT
          t.symbol,
@@ -157,42 +150,35 @@ export async function getPortfolioSummary(userId: string): Promise<{
        JOIN buy_avg b ON b.symbol = s.symbol
      )
      SELECT
-       COUNT(*)::int                                                         AS total_trades,
-       COUNT(*) FILTER (WHERE pnl > 0)::int                                 AS winning_trades,
-       COUNT(*) FILTER (WHERE pnl <= 0)::int                                AS losing_trades,
-       COALESCE(SUM(pnl), 0)::numeric                                       AS total_realised_pnl,
-       (SELECT symbol FROM pnl_per_trade ORDER BY pnl DESC  LIMIT 1)        AS best_symbol,
-       (SELECT pnl    FROM pnl_per_trade ORDER BY pnl DESC  LIMIT 1)        AS best_pnl,
-       (SELECT symbol FROM pnl_per_trade ORDER BY pnl ASC   LIMIT 1)        AS worst_symbol,
-       (SELECT pnl    FROM pnl_per_trade ORDER BY pnl ASC   LIMIT 1)        AS worst_pnl
+       COUNT(*)::int AS total_trades,
+       COUNT(*) FILTER (WHERE pnl > 0)::int AS winning_trades,
+       COUNT(*) FILTER (WHERE pnl <= 0)::int AS losing_trades,
+       COALESCE(SUM(pnl), 0)::numeric AS total_realised_pnl,
+       (SELECT symbol FROM pnl_per_trade ORDER BY pnl DESC LIMIT 1) AS best_symbol,
+       (SELECT pnl FROM pnl_per_trade ORDER BY pnl DESC LIMIT 1) AS best_pnl,
+       (SELECT symbol FROM pnl_per_trade ORDER BY pnl ASC LIMIT 1) AS worst_symbol,
+       (SELECT pnl FROM pnl_per_trade ORDER BY pnl ASC LIMIT 1) AS worst_pnl
      FROM pnl_per_trade`,
     [userId]
   );
 
-  const row = result.rows[0];
-  const total_trades   = row?.total_trades   ?? 0;
-  const winning_trades = row?.winning_trades ?? 0;
-  const losing_trades  = row?.losing_trades  ?? 0;
+  const row = result.rows[0] || {};
+
+  const total_trades   = row.total_trades   ?? 0;
+  const winning_trades = row.winning_trades ?? 0;
+  const losing_trades  = row.losing_trades  ?? 0;
 
   return {
     total_trades,
     winning_trades,
     losing_trades,
     win_rate: total_trades > 0 ? (winning_trades / total_trades) * 100 : 0,
-    total_realised_pnl: parseFloat((row as unknown as Record<string, string>)?.total_realised_pnl ?? '0'),
-    best_trade:
-      (row as unknown as Record<string, string | null>)?.best_symbol
-        ? {
-            symbol: (row as unknown as Record<string, string>).best_symbol,
-            pnl: parseFloat((row as unknown as Record<string, string>).best_pnl),
-          }
-        : null,
-    worst_trade:
-      (row as unknown as Record<string, string | null>)?.worst_symbol
-        ? {
-            symbol: (row as unknown as Record<string, string>).worst_symbol,
-            pnl: parseFloat((row as unknown as Record<string, string>).worst_pnl),
-          }
-        : null,
+    total_realised_pnl: parseFloat(row.total_realised_pnl ?? '0'),
+    best_trade: row.best_symbol
+      ? { symbol: row.best_symbol, pnl: parseFloat(row.best_pnl) }
+      : null,
+    worst_trade: row.worst_symbol
+      ? { symbol: row.worst_symbol, pnl: parseFloat(row.worst_pnl) }
+      : null,
   };
 }

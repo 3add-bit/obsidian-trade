@@ -4,7 +4,7 @@ import type { PricesQuery } from './portfolio.schemas';
 import { sendSuccess } from '../../utils/response';
 
 export async function getPortfolio(
-  req: Request<object, object, object, PricesQuery>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -18,7 +18,7 @@ export async function getPortfolio(
 }
 
 export async function getPosition(
-  req: Request<{ symbol: string }, object, object, PricesQuery>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {

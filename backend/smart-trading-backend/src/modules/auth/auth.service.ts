@@ -18,7 +18,7 @@ function issueAccessToken(user: User): string {
     email: user.email,
     username: user.username,
   };
-  return jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
+  return jwt.sign(payload, env.JWT_SECRET as string, { expiresIn: env.JWT_EXPIRES_IN as any});
 }
 
 async function issueRefreshToken(userId: string): Promise<string> {
@@ -37,7 +37,7 @@ async function issueRefreshToken(userId: string): Promise<string> {
 
   // Return signed JWT so the client stores one opaque token
   const payload: RefreshTokenPayload = { sub: userId, tokenId };
-  return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: env.JWT_REFRESH_EXPIRES_IN });
+  return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: env.JWT_REFRESH_EXPIRES_IN as any });
 }
 
 // ── Service methods ────────────────────────────────────────────────────────────
