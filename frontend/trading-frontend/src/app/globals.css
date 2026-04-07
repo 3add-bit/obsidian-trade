@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-syne:    'Syne', sans-serif;
+  --font-geist:   system-ui, -apple-system, sans-serif;
+  --font-dm-mono: 'DM Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #0a0c12;
+  color: #e8eaf0;
+  font-family: var(--font-geist);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2f3c; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #3a4055; }
+
+/* ── Selection ─────────────────────────────────────────────── */
+::selection { background: rgba(59,130,246,0.3); color: #fff; }
+
+/* ── Number font ───────────────────────────────────────────── */
+.font-num {
+  font-family: var(--font-dm-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ── Gradient text ─────────────────────────────────────────── */
+.text-gradient-green {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-red {
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-blue {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card base ─────────────────────────────────────────────── */
+.card {
+  background: #111318;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.4);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* ── Input ─────────────────────────────────────────────────── */
+.input-dark {
+  background: #0a0c12;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: #e8eaf0;
+  font-family: var(--font-dm-mono);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  padding: 12px 16px;
+  width: 100%;
+}
+.input-dark:focus {
+  border-color: rgba(59,130,246,0.5);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+.input-dark::placeholder { color: #3a4055; }
+
+/* ── Shimmer loading ───────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, #111318 25%, #191c24 50%, #111318 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* ── Recharts overrides ────────────────────────────────────── */
+.recharts-tooltip-wrapper { outline: none !important; }
+.recharts-default-tooltip {
+  background: #191c24 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
+/* ── Sidebar active state ──────────────────────────────────── */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+  cursor: pointer;
+}
+.nav-item:hover { color: #e8eaf0; background: rgba(255,255,255,0.04); }
+.nav-item.active {
+  color: #e8eaf0;
+  background: rgba(59,130,246,0.12);
+  box-shadow: inset 3px 0 0 #3b82f6;
+}
