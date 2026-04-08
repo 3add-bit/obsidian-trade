@@ -1,10 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'
+// ✅ FIXED ENV VARIABLE NAME
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://obsidian-trade.onrender.com/api/v1'
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 15_000,
+  timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -46,8 +47,9 @@ api.interceptors.response.use(
         const { data } = await axios.post(`${BASE_URL}/auth/refresh`, {
           refresh_token: refreshToken,
         })
-        const newAccessToken: string = data.data.access_token
-        const newRefreshToken: string = data.data.refresh_token
+
+        const newAccessToken = data.data.access_token
+        const newRefreshToken = data.data.refresh_token
 
         localStorage.setItem('access_token', newAccessToken)
         localStorage.setItem('refresh_token', newRefreshToken)
@@ -71,29 +73,25 @@ api.interceptors.response.use(
   }
 )
 
-// ── Auth endpoints ────────────────────────────────────────────────────────────
+// ── Auth endpoints ───────────────────────────────────────────
 export const authApi = {
-  register: (body: { username: string; email: string; password: string; risk_profile?: string }) =>
-    api.post('/auth/register', body),
-  login: (body: { email: string; password: string }) =>
-    api.post('/auth/login', body),
+  register: (body) => api.post('/auth/register', body),
+  login: (body) => api.post('/auth/login', body),
   me: () => api.get('/auth/me'),
 }
 
-// ── Trading endpoints ─────────────────────────────────────────────────────────
+// ── Trading endpoints ───────────────────────────────────────
 export const tradesApi = {
-  place: (body: { symbol: string; side: 'BUY' | 'SELL'; quantity: number; price: number; notes?: string }) =>
-    api.post('/trades', body),
-  history: (params?: { symbol?: string; side?: string; limit?: number; offset?: number }) =>
-    api.get('/trades', { params }),
-  byId: (id: string) => api.get(`/trades/${id}`),
+  place: (body) => api.post('/trades', body),
+  history: (params) => api.get('/trades', { params }),
+  byId: (id) => api.get(`/trades/${id}`),
 }
 
-// ── Portfolio endpoints ───────────────────────────────────────────────────────
+// ── Portfolio endpoints ─────────────────────────────────────
 export const portfolioApi = {
-  get: (prices?: Record<string, number>) =>
+  get: (prices) =>
     api.get('/portfolio', { params: prices ? { prices: JSON.stringify(prices) } : {} }),
   summary: () => api.get('/portfolio/summary'),
-  position: (symbol: string, prices?: Record<string, number>) =>
+  position: (symbol, prices) =>
     api.get(`/portfolio/${symbol}`, { params: prices ? { prices: JSON.stringify(prices) } : {} }),
 }
